@@ -1,0 +1,190 @@
+#!/bin/bash
+
+# --------------------------------------------------------------
+# iOSOpenDev -- iOS Open Development (http://www.iOSOpenDev.com)
+# Copyright (C) 2012 Spencer W.S. James <dev@iosopendev.com>
+# --------------------------------------------------------------
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+# --------------------------------------------------------------
+# iOSOpenDev is an independent project and has not been authorized, sponsored, or otherwise approved by Apple Inc.
+# IOS is a registered trademark of Cisco.
+# --------------------------------------------------------------
+
+export setCmd="set -eo pipefail"
+$setCmd
+
+# script #
+
+export scriptName="${0##*/}"
+export scriptVer="1.0"
+
+export iOSOpenDevPath="/opt/iOSOpenDev"
+
+export userName="${SUDO_USER-$USER}"
+export userGroup=`id -g $userName`
+export userHome=`eval echo ~$userName`
+export bashProfileFiles=("$userHome/.bash_profile" "$userHome/.bash_login" "$userHome/.profile")
+
+unset LANG
+
+# panic and cleanup #
+
+function cleanup()
+{
+	local exitCode=$?
+	set +e
+	trap - $signals	
+	exit $exitCode
+}
+function panic()
+{
+	local exitCode=$1
+	set +e
+	shift
+	[[ "$@" == "" ]] || echo "$@" >&2
+	exit $exitCode
+}
+export signals="0 1 2 3 15"
+trap cleanup $signals
+
+# functions #
+
+function determineUserBashProfileFile()
+{
+	$setCmd
+
+	local f
+	local filePath
+	
+	for f in "${bashProfileFiles[@]}"; do
+		if [[ -f "$f" ]]; then
+			filePath="$f"
+			echo "" >> "$f" || \
+				panic $? "Failed to echo into $f"
+			break
+		fi
+	done
+	
+	if [[ $filePath == "" ]]; then
+		filePath="$bashProfileFiles"
+
+		touch "$filePath" || \
+			panic $? "Failed to touch $filePath"
+			
+		chown "$userName:$userGroup" "$filePath" || \
+			panic $? "Failed to change owner-group of $filePath"
+		
+		chmod 0600 "$filePath" || \
+			panic $? "Failed to change mode of $filePath"
+	fi
+	
+	# return #
+	echo "$filePath"
+}
+
+function addToFileIfMissing()
+{
+	local filePath="$1"
+	local pattern="$2"
+	local value="$3"
+	local doesContain
+
+	doesContain=`doesFileContain "$filePath" "$pattern"`
+	
+	[[ $doesContain == true ]] || \
+		echo "$value" >> "$filePath" || \
+			panic $? "Failed to echo into $filePath"	
+}
+
+function doesFileContain()
+{
+	$setCmd
+	
+	local filePath="$1"
+	local pattern="$2"
+	local grepReturn
+	local funcReturn
+	
+	set -e
+	grep -Piq "$pattern" "$filePath" || grepReturn=$?
+	set +e
+
+	if [[ $grepReturn == "" || $grepReturn == 0 ]]; then # contains
+		funcReturn=true
+	elif [[ $grepReturn == 1 ]]; then # doesn't contain
+		funcReturn=false
+	else # error
+		panic $grepReturn "Failed to grep $filePath"
+	fi
+	
+	# return #
+	echo $funcReturn
+}
+
+# options #
+
+case "$1" in
+	-h|--help) panic 1 "iOSOpenDev: $scriptName v$scriptVer -- setup base and templates
+Usage: $scriptName" ;;
+esac
+
+# begin script ... #
+
+# get iOSOpenDev base and templates #
+
+echo "Getting base and templates from GitHub..."
+
+gitRepo="git://github.com/kokoabim/iOSOpenDev.git"
+
+[[ ! -d "$iOSOpenDevPath" ]] || \
+	rm -rf "$iOSOpenDevPath" || \
+		panic $? "Failed to remove existing directory: $iOSOpenDevPath"
+
+mkdir -p "$iOSOpenDevPath" || \
+	panic $? "Failed to make directory: $iOSOpenDevPath"
+
+git clone --recursive --recurse-submodules "$gitRepo" "$iOSOpenDevPath" || \
+	panic $? "Failed to clone git repo: $gitRepo"
+
+# symlink to templates #
+
+echo "Creating symlink to Xcode templates..."
+
+userDevDir="$userHome/Library/Developer"
+userTemplatesDir="$userDevDir/Xcode/Templates"
+
+if [[ ! -d "$userTemplatesDir" ]]; then
+	mkdir -p "$userTemplatesDir" || \
+		panic $? "Failed to make directory: $userTemplatesDir"
+		
+	chown -R "$userName:$userGroup" "$userDevDir" || \
+		panic $? "Failed to change ownership-group of $userDevDir"
+fi
+
+ln -fhs "$iOSOpenDevPath/templates" "$userTemplatesDir/iOSOpenDev"
+
+# bash profile #
+
+echo "Modifying Bash personal initialization file..."
+
+userBashProfileFile=`determineUserBashProfileFile`
+
+addToFileIfMissing "$userBashProfileFile" "^(export)? *iOSOpenDevPath=.*" "export iOSOpenDevPath=$iOSOpenDevPath"
+addToFileIfMissing "$userBashProfileFile" "^(export)? *iOSOpenDevDevice=.*" "export iOSOpenDevDevice="
+addToFileIfMissing "$userBashProfileFile" "^(export)? *PATH=.*(\\\$iOSOpenDevPath/bin|$iOSOpenDevPath/bin).*" "export PATH=$iOSOpenDevPath/bin:\$PATH"
+addToFileIfMissing "$userBashProfileFile" "^(export)? *PATH=.*/opt/local/bin:.*" "export PATH=/opt/local/bin:\$PATH"
+addToFileIfMissing "$userBashProfileFile" "^(export)? *PATH=.*/opt/local/sbin:.*" "export PATH=/opt/local/sbin:\$PATH"
+
+# done #
+
+exit 0
