@@ -3,12 +3,13 @@
 set -e
 
 export iOSOpenDevPath="/opt/iOSOpenDev"
-setupScript="$iOSOpenDevPath/bin/iod-setup-sdk"
+setupScript="$iOSOpenDevPath/bin/iod-setup"
 
 if [[ -f "$setupScript" ]]; then
 	echo "Running $setupScript..."
-	"$setupScript" -sdk iphoneos
-	"$setupScript" -sdk iphonesimulator
+	"$setupScript" base
+	"$setupScript" sdk -sdk iphoneos
+	"$setupScript" sdk -sdk iphonesimulator
 else
 	echo "Missing $setupScript"
 	exit 1
