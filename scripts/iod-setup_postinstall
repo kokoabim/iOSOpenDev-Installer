@@ -3,16 +3,24 @@
 set -e
 
 export iOSOpenDevPath="/opt/iOSOpenDev"
-setupScript="$iOSOpenDevPath/bin/iod-setup"
+
+setupPath="/opt/iOSOpenDevSetup"
+setupScript="$setupPath/bin/iod-setup"
 
 if [[ -f "$setupScript" ]]; then
 	echo "Running $setupScript..."
 	"$setupScript" base
 	"$setupScript" sdk -sdk iphoneos
 	"$setupScript" sdk -sdk iphonesimulator
+
+	echo "Copying setup tool to iOSOpenDev bin..."
+	cp -f "$setupScript" "$iOSOpenDevPath/bin"
+
+	rm -rf "$setupPath"
+	exit 0
 else
 	echo "Missing $setupScript"
+
+	rm -rf "$setupPath"
 	exit 1
 fi
-
-exit 0

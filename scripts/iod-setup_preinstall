@@ -2,6 +2,7 @@
 
 set -e
 
-iOSOpenDevPath="/opt/iOSOpenDev"
+setupPath="/opt/iOSOpenDevSetup"
 
-[[ -d "$iOSOpenDevPath/bin" ]] || mkdir -p "$iOSOpenDevPath/bin"
+[[ -d "$setupPath/bin" ]] || \
+	mkdir -p "$setupPath/bin"
