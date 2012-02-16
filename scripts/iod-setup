@@ -104,6 +104,15 @@ function changeMode()
 
 # base argument functions #
 
+function cloneGitRepo()
+{
+	local repoUrl="$1"
+	local targetDir="$2"
+	
+	git clone "$repoUrl" "$targetDir" || \
+		panic $? "Failed to clone git repo: $repoUrl"
+}
+
 function determineUserBashProfileFile()
 {
 	$setCmd
@@ -462,8 +471,6 @@ base)
 	
 	echo "Getting base and templates from GitHub..."
 	
-	gitRepo="git://github.com/kokoabim/iOSOpenDev.git"
-	
 	[[ ! -d "$iOSOpenDevPath" ]] || \
 		rm -rf "$iOSOpenDevPath" || \
 			panic $? "Failed to remove existing directory: $iOSOpenDevPath"
@@ -471,8 +478,9 @@ base)
 	mkdir -p "$iOSOpenDevPath" || \
 		panic $? "Failed to make directory: $iOSOpenDevPath"
 	
-	git clone --recursive --recurse-submodules "$gitRepo" "$iOSOpenDevPath" || \
-		panic $? "Failed to clone git repo: $gitRepo"
+	cloneGitRepo "git://github.com/kokoabim/iOSOpenDev.git" "$iOSOpenDevPath"
+	cloneGitRepo "git://github.com/kokoabim/iOSOpenDev-Xcode-Templates.git" "$iOSOpenDevPath/templates"
+	cloneGitRepo "git://github.com/kokoabim/iOSOpenDev-Framework-Header-Files.git" "$iOSOpenDevPath/frameworks"
 	
 	# symlink to templates #
 	
