@@ -440,7 +440,7 @@ function requireOptionValue()
 function showUsage()
 {
 	panic 1 \
-"iOSOpenDev Setup ($scriptName)
+"$scriptName (v${scriptVer}) -- iOSOpenDev Setup
 Usage:
    $scriptName base
    $scriptName sdk [-sdk <sdk>]
