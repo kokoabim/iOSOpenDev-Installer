@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 # --------------------------------------------------------------
 # iOSOpenDev is an independent project and has not been authorized, sponsored, or otherwise approved by Apple Inc.
-# IOS is a registered trademark of Cisco.
+# IOS is a registered trademark of Cisco and is used under license by Apple Inc.
 # --------------------------------------------------------------
 
 export setCmd="set -eo pipefail"
@@ -40,6 +40,12 @@ export tempDirsFile="`mktemp -d -t iosod`/tempdirs"
 touch "$tempDirsFile"
 
 unset LANG
+
+# development tools #
+
+xcodeAsAppPath="/Applications/Xcode.app/Contents/Developer"
+[[ ! -d "$xcodeAsAppPath" ]] || \
+	export DEVELOPER_DIR="$xcodeAsAppPath"
 
 # panic and cleanup #
 
@@ -443,23 +449,44 @@ function createSymlink()
 function requireOptionValue()
 {
 	[[ "$2" != "" ]] || \
-		panic 1 "Missing argument value: $1"
+		panic 1 "Missing value for $1 option"
 }
 
 function showUsage()
 {
 	panic 1 \
 "$scriptName (v${scriptVer}) -- iOSOpenDev Setup
-Usage:
+Usages:
    $scriptName base
-   $scriptName sdk [-sdk <sdk>]
+   $scriptName sdk [-sdk <sdk>] [-d <directory>]
 
 Arguments:
    base               Set up iOSOpenDev base and Xcode templates.
    sdk [-sdk <sdk>]   SDK name and, optionally, version, as one word, to set
                       up for \"open\" development. If version is omitted,
                       latest SDK version is used. If <sdk> is entirely omitted,
-                      latest iPhoneOS SDK is used."
+                      latest iPhoneOS SDK is used.
+
+Options:
+   -d <directory>     Set environment variable DEVELOPER_DIR to <directory> to
+                      target specific developer tools. Use of this option is
+                      required only if Xcode 4.3 (or greater) has been
+                      installed and you wish to target SDKs used by older
+                      versions of Xcode. If Xcode 4.3 has not been installed
+                      or SDKs used by prior Xcode versions are not to be
+                      targeted, use of the option is not needed.
+                      
+Examples:
+   Xcode 4.2 and 4.3 (or greater) are both installed and you wish to target the
+   SDK used by 4.2:
+      \`$scriptName sdk -d /Developer\`
+
+   Xcode 4.2 and 4.3 (or greater) are both installed and you wish to target the
+   SDK used by 4.3:
+      \`$scriptName sdk\`
+
+   Either Xcode 4.2 or 4.3 (or greater) is installed by itself:
+      \`$scriptName sdk\`"
 }
 
 # begin script ... #
@@ -467,9 +494,9 @@ Arguments:
 case "$1" in
 base)
 	
-	# get iOSOpenDev base and templates #
+	# get iOSOpenDev base, frameworks and templates #
 	
-	echo "Getting base and templates from GitHub..."
+	echo "Downloading base, frameworks and templates from GitHub..."
 	
 	[[ ! -d "$iOSOpenDevPath" ]] || \
 		rm -rf "$iOSOpenDevPath" || \
@@ -519,13 +546,21 @@ sdk)
 	
 	sdk="iphoneos" # default to latest iphoneos sdk
 	
-	if [[ "$1" != "" ]]; then
-		[[ "$1" == "-sdk" ]] || \
-			panic $? "Invalid option: $1"
-		[[ "$2" != "" ]] || \
-			panic $? "Missing value for -sdk option"
-		sdk="$2"
-	fi
+	while [[ $1 != "" ]]; do
+	case "$1" in
+		-sdk)
+			requireOptionValue "$1" "$2"
+			sdk="$2"
+			shift 2
+		;;
+		-d)
+			requireOptionValue "$1" "$2"
+			export DEVELOPER_DIR="$2"
+			shift 2
+		;;
+		*) panic 1 "Invalid option: $1" ;;
+	esac
+	done
 
 	# get sdk platform-name and version
 	

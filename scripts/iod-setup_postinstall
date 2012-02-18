@@ -13,13 +13,13 @@ if [[ -f "$setupScript" ]]; then
 	"$setupScript" sdk -sdk iphoneos
 	"$setupScript" sdk -sdk iphonesimulator
 
-	echo "Copying setup tool to iOSOpenDev bin..."
+	echo "Copying $setupScript to $iOSOpenDevPath/bin..."
 	cp -f "$setupScript" "$iOSOpenDevPath/bin"
 
 	rm -rf "$setupPath"
 	exit 0
 else
-	echo "Missing $setupScript"
+	echo "$setupScript not found!"
 
 	rm -rf "$setupPath"
 	exit 1
