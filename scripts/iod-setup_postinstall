@@ -3,9 +3,41 @@
 set -e
 
 export iOSOpenDevPath="/opt/iOSOpenDev"
-
 sourceDir="/opt/iOSOpenDevSetup"
 scriptPath="$sourceDir/bin/iod-setup"
+
+function remove50DumpedHeaders()
+{
+	local removeWhat="$1"
+	local fileNamePattern="*${2}.h"
+	local sdk50Root="/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk"
+	local basePath
+	local foundFiles
+	local f
+
+	if [[ $removeWhat == "private" ]]; then
+		basePath="$sdk50Root/System/Library/PrivateFrameworks"
+	elif [[ $removeWhat == "public" ]]; then
+		basePath="$sdk50Root/System/Library/Frameworks"
+	else
+		return
+	fi
+
+	if [[ -d "$basePath" ]]; then
+		foundFiles=(`find "$basePath" -type f -name "$fileNamePattern"`)
+		
+		if [[ "${#foundFiles[@]}" != 0 ]]; then
+			echo "Removing ${#foundFiles[@]} header files matching '$fileNamePattern' under '$basePath'..."
+			
+			for f in "${foundFiles[@]}"; do
+				rm -f "$f" || true # forget abou' it
+			done		
+		else
+			echo "No header files found matching '$fileNamePattern' under '$basePath'."
+		fi
+	fi
+}
+
 
 if [[ -f "$scriptPath" ]]; then
 	echo "Running $scriptPath..."
@@ -17,11 +49,11 @@ if [[ -f "$scriptPath" ]]; then
 	cp -f "$scriptPath" "$iOSOpenDevPath/bin"
 	rm -rf "$sourceDir"
 	
-	echo "Removing pre-1.0.5 dump header files..."
-	"$iOSOpenDevPath/bin/iosod" rmheaders public "_iOSOpenDev_*"
-	"$iOSOpenDevPath/bin/iosod" rmheaders public "_Dumped"
-	"$iOSOpenDevPath/bin/iosod" rmheaders private "_iOSOpenDev_*"
-	"$iOSOpenDevPath/bin/iosod" rmheaders private ""
+	echo "Removing pre-1.0.5 iOS SDK 5.0 dump header files..."
+	remove50DumpedHeaders public "_iOSOpenDev_*"
+	remove50DumpedHeaders public "_Dumped"
+	remove50DumpedHeaders private "_iOSOpenDev_*"
+	remove50DumpedHeaders private ""
 
 	exit 0
 else
