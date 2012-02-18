@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -e
+
+export iOSOpenDevPath="/opt/iOSOpenDev"
+
+sourceDir="/opt/iOSOpenDevUninstall"
+scriptPath="$sourceDir/bin/iod-uninstall"
+
+if [[ -f "$scriptPath" ]]; then
+	echo "Copying $scriptPath to $iOSOpenDevPath/bin..."
+	cp -f "$scriptPath" "$iOSOpenDevPath/bin"
+
+	rm -rf "$sourceDir"
+	exit 0
+else
+	echo "$scriptPath not found!"
+
+	rm -rf "$sourceDir"
+	exit 1
+fi

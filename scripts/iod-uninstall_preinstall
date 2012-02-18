@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+
+targetDir="/opt/iOSOpenDevUninstall/bin"
+
+[[ -d "$targetDir" ]] || \
+	mkdir -p "$targetDir"

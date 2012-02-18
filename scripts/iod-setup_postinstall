@@ -4,23 +4,29 @@ set -e
 
 export iOSOpenDevPath="/opt/iOSOpenDev"
 
-setupPath="/opt/iOSOpenDevSetup"
-setupScript="$setupPath/bin/iod-setup"
+sourceDir="/opt/iOSOpenDevSetup"
+scriptPath="$sourceDir/bin/iod-setup"
 
-if [[ -f "$setupScript" ]]; then
-	echo "Running $setupScript..."
-	"$setupScript" base
-	"$setupScript" sdk -sdk iphoneos
-	"$setupScript" sdk -sdk iphonesimulator
+if [[ -f "$scriptPath" ]]; then
+	echo "Running $scriptPath..."
+	"$scriptPath" base
+	"$scriptPath" sdk -sdk iphoneos
+	"$scriptPath" sdk -sdk iphonesimulator
 
-	echo "Copying $setupScript to $iOSOpenDevPath/bin..."
-	cp -f "$setupScript" "$iOSOpenDevPath/bin"
+	echo "Copying $scriptPath to $iOSOpenDevPath/bin..."
+	cp -f "$scriptPath" "$iOSOpenDevPath/bin"
+	rm -rf "$sourceDir"
+	
+	echo "Removing pre-1.0.5 dump header files..."
+	"$iOSOpenDevPath/bin/iosod" rmheaders public "_iOSOpenDev_*"
+	"$iOSOpenDevPath/bin/iosod" rmheaders public "_Dumped"
+	"$iOSOpenDevPath/bin/iosod" rmheaders private "_iOSOpenDev_*"
+	"$iOSOpenDevPath/bin/iosod" rmheaders private ""
 
-	rm -rf "$setupPath"
 	exit 0
 else
-	echo "$setupScript not found!"
+	echo "$scriptPath not found!"
 
-	rm -rf "$setupPath"
+	rm -rf "$sourceDir"
 	exit 1
 fi
