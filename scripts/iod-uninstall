@@ -23,10 +23,13 @@
 export setCmd="set -eo pipefail"
 $setCmd
 
+# path #
+export PATH=/opt/iOSOpenDev/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
+
 # script #
 
 export scriptName="${0##*/}"
-export scriptVer="1.0"
+export scriptVer="1.0.1"
 
 export iOSOpenDevPath="/opt/iOSOpenDev"
 export backupFileExt=".iOSOpenDev"
