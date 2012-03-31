@@ -29,7 +29,7 @@ export PATH=/opt/iOSOpenDev/bin:/opt/local/bin:/opt/local/sbin:/usr/local/git/bi
 # script #
 
 export scriptName="${0##*/}"
-export scriptVer="1.0.2"
+export scriptVer="1.0.3"
 
 export iOSOpenDevPath="/opt/iOSOpenDev"
 export backupFileExt=".iOSOpenDev"
@@ -174,23 +174,16 @@ function doesFileContain()
 	
 	local filePath="$1"
 	local pattern="$2"
-	local grepReturn
-	local funcReturn
+	local result
 	
-	set -e
-	grep -Piq "$pattern" "$filePath" || grepReturn=$?
-	set +e
-
-	if [[ $grepReturn == "" || $grepReturn == 0 ]]; then # contains
-		funcReturn=true
-	elif [[ $grepReturn == 1 ]]; then # doesn't contain
-		funcReturn=false
-	else # error
-		panic $grepReturn "Failed to grep $filePath"
-	fi
+	result=$(perl -ne "if (\$_ =~ m/$pattern/) { print \"true\"; exit; }" "$filePath") || \
+		panic $? "Failed to run perl on $filePath"
+	
+	[[ $result == "true" ]] || \
+		result="false"
 	
 	# return #
-	echo $funcReturn
+	echo "$result"
 }
 
 # sdk argument functions #
@@ -534,13 +527,12 @@ base)
 	echo "Modifying Bash personal initialization file..."
 	
 	userBashProfileFile=`determineUserBashProfileFile`
-	
+
 	addToFileIfMissing "$userBashProfileFile" "^(export)? *iOSOpenDevPath=.*" "export iOSOpenDevPath=$iOSOpenDevPath"
 	addToFileIfMissing "$userBashProfileFile" "^(export)? *iOSOpenDevDevice=.*" "export iOSOpenDevDevice="
-	addToFileIfMissing "$userBashProfileFile" "^(export)? *PATH=.*(\\\$iOSOpenDevPath/bin|$iOSOpenDevPath/bin).*" "export PATH=$iOSOpenDevPath/bin:\$PATH"
-	addToFileIfMissing "$userBashProfileFile" "^(export)? *PATH=.*/opt/local/bin:.*" "export PATH=/opt/local/bin:\$PATH"
-	addToFileIfMissing "$userBashProfileFile" "^(export)? *PATH=.*/opt/local/sbin:.*" "export PATH=/opt/local/sbin:\$PATH"
-
+	addToFileIfMissing "$userBashProfileFile" "^(export)? *PATH=.*(\\\$iOSOpenDevPath\\/bin|${iOSOpenDevPath//\//\\/}\\/bin).*" "export PATH=$iOSOpenDevPath/bin:\$PATH"
+	addToFileIfMissing "$userBashProfileFile" "^(export)? *PATH=.*\\/opt\\/local\\/bin:.*" "export PATH=/opt/local/bin:\$PATH"
+	addToFileIfMissing "$userBashProfileFile" "^(export)? *PATH=.*\\/opt\\/local\\/sbin:.*" "export PATH=/opt/local/sbin:\$PATH"
 ;;
 	
 sdk)
