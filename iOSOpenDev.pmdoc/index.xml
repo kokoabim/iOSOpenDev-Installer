@@ -1,4 +1,4 @@
-<pkmkdoc spec="1.12"><properties><title>iOSOpenDev (1.3)</title><build>/Users/spencer/Projects/iOSOpenDev/packages/iOSOpenDev-1.3.pkg</build><organization>com.iosopendev</organization><userSees ui="easy"/><min-target os="3"/><domain/></properties><distribution><versions min-spec="1.000000"/><scripts></scripts></distribution><contents><choice title="Install iOSOpenDev and Set Up SDK" id="iodinstall" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="com.iosopendev.iosopendev13.iod-setup.pkg"/></choice><choice title="iOSOpenDev Uninstall Command-Line Tool" id="ioduninstall" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="com.iosopendev.iosopendev13.iod-uninstall.pkg"/></choice></contents><resources bg-scale="none" bg-align="topleft"><locale lang="en"><resource mime-type="text/rtf" kind="embedded" type="license"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf470
+<pkmkdoc spec="1.12"><properties><title>iOSOpenDev (1.4)</title><build>/Users/spencer/Projects/iOSOpenDev/packages/iOSOpenDev-1.4.pkg</build><organization>com.iosopendev</organization><userSees ui="easy"/><min-target os="3"/><domain/></properties><distribution><versions min-spec="1.000000"/><scripts></scripts></distribution><contents><choice title="Install iOSOpenDev and Set Up SDK" id="iodinstall" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="com.iosopendev.iosopendev14.iod-setup.pkg"/></choice><choice title="iOSOpenDev Uninstall Command-Line Tool" id="ioduninstall" starts_selected="true" starts_enabled="true" starts_hidden="false"><pkgref id="com.iosopendev.iosopendev14.iod-uninstall.pkg"/></choice></contents><resources bg-scale="none" bg-align="topleft"><locale lang="en"><resource mime-type="text/rtf" kind="embedded" type="license"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf470
 {\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
@@ -351,38 +351,7 @@ This General Public License does not permit incorporating your program into\
 proprietary programs.  If your program is a subroutine library, you may\
 consider it more useful to permit linking proprietary applications with the\
 library.  If this is what you want to do, use the GNU Lesser General\
-Public License instead of this License.}]]></resource><resource mime-type="text/rtf" kind="embedded" type="readme"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf470
-{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
-{\colortbl;\red255\green255\blue255;\red255\green0\blue0;}
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
-
-\f0\b\fs30 \cf2 \
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc
-\cf2 Required Before Continuing\cf0 \
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
-
-\b0\fs26 \cf0 \
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
-
-\b\fs28 \cf0 1. dpkg
-\b0\fs26 \
-\
-MacPorts is required to install dpkg:\
-\'95 Download it from {\field{\*\fldinst{HYPERLINK "http://www.macports.org/"}}{\fldrslt http://www.macports.org/}}.\
-\'95 Run its installer.\
-\'95 Log out and back in (maybe even a reboot is needed).\
-\
-To install dpkg:\
-\'95 In Terminal, run: `sudo port -f install dpkg`\
-\
-
-\b\fs28 2. Git
-\b0\fs26 \
-\
-To install Git:\
-\'95 Download it from {\field{\*\fldinst{HYPERLINK "http://git-scm.com/"}}{\fldrslt http://git-scm.com/}}.\
-\'95 Run its installer.\
-\'95 Log out and back in (maybe even a reboot is needed).}]]></resource><resource mime-type="text/rtf" kind="embedded" type="welcome"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf470
+Public License instead of this License.}]]></resource><resource mime-type="text/rtf" kind="embedded" type="welcome"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf470
 {\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
 {\colortbl;\red255\green255\blue255;}
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
@@ -418,5 +387,4 @@ Contact \'97 dev@iosopendev.com\
 \
 \'95 The `iosod` command-line tool was placed in /opt/iOSOpenDev/bin. This is used by Xcode during Build Phases of projects created from iOSOpenDev templates. It also provides other various functions. To see all of its usages: Open Terminal and type `iosod --help`.\
 \
-\'95 The `iod-uninstall` command-line tool was placed in /opt/iOSOpenDev/bin. It provides ability to uninstall iOSOpenDev. To see all of its usages: Open Terminal and type `iod-uninstall --help`.\
-}]]></resource></locale></resources><requirements><requirement id="sosv" operator="ge" value="'10.6'"/><requirement id="tosv" operator="ge" value="'10.6'"/></requirements><flags/><item type="file">01iod.xml</item><item type="file">02iod.xml</item><mod>properties.title</mod><mod>properties.customizeOption</mod><mod>description</mod><mod>properties.anywhereDomain</mod><mod>properties.systemDomain</mod></pkmkdoc>
+\'95 The `iod-uninstall` command-line tool was placed in /opt/iOSOpenDev/bin. It provides ability to uninstall iOSOpenDev. To see all of its usages: Open Terminal and type `iod-uninstall`.}]]></resource></locale></resources><requirements><requirement id="sosv" operator="ge" value="'10.6'"/><requirement id="tosv" operator="ge" value="'10.6'"/></requirements><flags/><item type="file">01iod.xml</item><item type="file">02iod.xml</item><mod>properties.title</mod><mod>properties.customizeOption</mod><mod>description</mod><mod>properties.anywhereDomain</mod><mod>properties.systemDomain</mod></pkmkdoc>

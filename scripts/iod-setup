@@ -30,7 +30,7 @@ export PATH=/opt/iOSOpenDev/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/us
 # script #
 
 export scriptName="${0##*/}"
-export scriptVer="1.1"
+export scriptVer="1.2"
 
 export iOSOpenDevPath="/opt/iOSOpenDev"
 export backupFileExt=".iOSOpenDev"
@@ -440,6 +440,37 @@ function createSymlink()
 		panic $? "Failed to create symbolic link $linkPath -> $sourcePath"
 }
 
+function createSdkPrivateHeaderSymlinks()
+{
+	local sdk="$1"
+	local iosSdkPath
+	local privateFWsDir
+	local privateFwBinaries
+	
+	iosSdkPath=`getSdkProperty $sdk Path`
+	
+	[[ -d "$iosSdkPath" ]] || \
+		panic 1 "SDK directory not found: $iosSdkPath"
+		
+	privateFWsDir="$iosSdkPath/System/Library/PrivateFrameworks"
+	
+	[[ -d "$privateFWsDir" ]] || \
+		panic 1 "PrivateFramework directory not found: $privateFWsDir"
+
+	privateFwBinaries=($(find "$privateFWsDir" -type f -perm +111 -ipath "*.framework/*"))
+	
+	for f in "${privateFwBinaries[@]}"; do
+		fullPath=`dirname "$f"`
+		shortPath="${fullPath/#$privateFWsDir}"
+		
+		sourcePath="${iOSOpenDevPath}/frameworks${shortPath}/Headers"
+		targetPath="${fullPath}/Headers"
+		
+		[[ ! -d "$sourcePath" ]] || \
+			createSymlink "$sourcePath" "$targetPath"
+	done
+}
+
 # script functions #
 
 function requireOptionValue()
@@ -574,6 +605,11 @@ Developer Tools: $DEVELOPER_DIR"
 	
 	echo "Modifying SDK settings..."
 	modifySdkSettings "$sdk"
+	
+	# symlink to dumped private frameworks header files
+	
+	echo "Symlinking to private frameworks header files..."
+	createSdkPrivateHeaderSymlinks "$sdk"
 
 	# add Xcode specifications
 	
