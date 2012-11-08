@@ -25,12 +25,12 @@ export setCmd="set -eo pipefail"
 $setCmd
 
 # path #
-export PATH=/opt/iOSOpenDev/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
+export PATH=/opt/iOSOpenDev/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
 # script #
 
 export scriptName="${0##*/}"
-export scriptVer="1.1"
+export scriptVer="1.2.1"
 
 export iOSOpenDevPath="/opt/iOSOpenDev"
 export backupFileExt=".iOSOpenDev"
@@ -143,6 +143,48 @@ function restoreFile()
 	fi
 }
 
+function removeSdkPrivateHeaderSymlinks()
+{
+	local sdk="$1"
+	local iosSdkPath
+	local privateFWsDir
+	local privateFwBinaries
+	local fullPath
+	local shortPath
+	local sourcePath
+	local targetPath
+	
+	iosSdkPath=`getSdkProperty $sdk Path`
+	
+	[[ -d "$iosSdkPath" ]] || \
+		panic 1 "SDK directory not found: $iosSdkPath"
+		
+	privateFWsDir="$iosSdkPath/System/Library/PrivateFrameworks"
+	
+	[[ -d "$privateFWsDir" ]] || \
+		panic 1 "PrivateFramework directory not found: $privateFWsDir"
+
+	privateFwBinaries=($(find "$privateFWsDir" -type f -perm +111 -ipath "*.framework/*"))
+	
+	for f in "${privateFwBinaries[@]}"; do
+		fullPath=`dirname "$f"`
+		targetPath="${fullPath}/Headers"
+
+		if [[ -e "$targetPath" ]] && [[ ! -L "$targetPath" ]]; then
+			echo "Skipping since not a symlink: $targetPath"
+		elif [[ -L "$targetPath" ]]; then
+			if [[ -f "$targetPath" ]]; then
+				echo "Skipping since symlinked to file: $targetPath"
+			elif [[ -d "$targetPath" ]] || [[ ! -e "$targetPath" ]]; then
+				rm -f "$targetPath" || \
+					panic $? "Failed to remove symlink: $targetPath"
+			else
+				echo "Skipping since symlinked to unknown type: $targetPath"
+			fi
+		fi
+	done
+}
+
 # script functions #
 
 function requireOptionValue()
@@ -192,6 +234,7 @@ if [[ ! -d "$DEVELOPER_DIR" ]] && [[ -d "$devToolsDir" ]]; then
 fi
 
 case "$1" in
+
 base)
 	echo "Uninstalling iOSOpenDev base, Xcode templates and framework header files..."
 	
@@ -266,10 +309,18 @@ Developer Tools: $DEVELOPER_DIR"
 	echo "Undoing modifications to $platformName $sdkVersion SDK..."
 
 	# restore SDKSettings.plist
-
+	
+	echo "Restoring SDK settings..."
 	restoreFile "$iosSdkPath/SDKSettings.plist"
 
+	# remove symlinks to dumped private frameworks header files
+	
+	echo "Removing symlinks to private frameworks header files..."
+	removeSdkPrivateHeaderSymlinks "$sdk"
+
 	# restore xcspec files
+
+	echo "Removing specifications from platform..."
 	
 	xcspecFileNamePrefix="$platformName"	
 	[[ ! $xcspecFileNamePrefix =~ "Simulator" ]] || \

@@ -25,12 +25,12 @@ export setCmd="set -eo pipefail"
 $setCmd
 
 # path #
-export PATH=/opt/iOSOpenDev/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
+export PATH=/opt/iOSOpenDev/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin:$PATH
 
 # script #
 
 export scriptName="${0##*/}"
-export scriptVer="1.2"
+export scriptVer="1.2.2"
 
 export iOSOpenDevPath="/opt/iOSOpenDev"
 export backupFileExt=".iOSOpenDev"
@@ -344,8 +344,8 @@ function addXcodeSpecs()
 	requireBackup "$iosPackagesTypesXCSpec"
 
 	# modify *PackageTypes.xcspec
-	addXcodeSpec "$iosPackagesTypesXCSpec" "com.apple.package-type.mach-o-executable" '{Type=PackageType;Identifier=com.apple.package-type.mach-o-executable;Name="Mach-O Executable";Description="Mach-O executable";DefaultBuildSettings={EXECUTABLE_PREFIX="";EXECUTABLE_SUFFIX="";EXECUTABLE_NAME="$(EXECUTABLE_PREFIX)$(PRODUCT_NAME)$(EXECUTABLE_VARIANT_SUFFIX)$(EXECUTABLE_SUFFIX)";EXECUTABLE_PATH="$(EXECUTABLE_NAME)";};ProductReference={FileType=compiled.mach-o.executable;Name="$(EXECUTABLE_NAME)";IsLaunchable=YES;};}'
-	addXcodeSpec "$iosPackagesTypesXCSpec" "com.apple.package-type.mach-o-dylib" '{Type=PackageType;Identifier=com.apple.package-type.mach-o-dylib;Name="Mach-O Dynamic Library";Description="Mach-O dynamic library";DefaultBuildSettings={EXECUTABLE_PREFIX="";EXECUTABLE_SUFFIX="";EXECUTABLE_NAME="$(EXECUTABLE_PREFIX)$(PRODUCT_NAME)$(EXECUTABLE_VARIANT_SUFFIX)$(EXECUTABLE_SUFFIX)";EXECUTABLE_PATH="$(EXECUTABLE_NAME)";};ProductReference={FileType=compiled.mach-o.dylib;Name="$(EXECUTABLE_NAME)";IsLaunchable=NO;};}'
+	addXcodeSpec "$iosPackagesTypesXCSpec" "com.apple.package-type.mach-o-executable" '{"ProductReference":{"IsLaunchable":"YES","FileType":"compiled.mach-o.executable","Name":"\$(EXECUTABLE_NAME)"},"DefaultBuildSettings":{"EXECUTABLE_NAME":"\$(EXECUTABLE_PREFIX)\$(PRODUCT_NAME)\$(EXECUTABLE_VARIANT_SUFFIX)\$(EXECUTABLE_SUFFIX)","EXECUTABLE_PATH":"\$(EXECUTABLE_NAME)","EXECUTABLE_SUFFIX":"","EXECUTABLE_PREFIX":""},"Type":"PackageType","Name":"Mach-O Executable","Identifier":"com.apple.package-type.mach-o-executable","Description":"Mach-O executable"}'
+	addXcodeSpec "$iosPackagesTypesXCSpec" "com.apple.package-type.mach-o-dylib" '{"ProductReference":{"IsLaunchable":"NO","FileType":"compiled.mach-o.dylib","Name":"\$(EXECUTABLE_NAME)"},"DefaultBuildSettings":{"EXECUTABLE_NAME":"\$(EXECUTABLE_PREFIX)\$(PRODUCT_NAME)\$(EXECUTABLE_VARIANT_SUFFIX)\$(EXECUTABLE_SUFFIX)","EXECUTABLE_PATH":"\$(EXECUTABLE_NAME)","EXECUTABLE_SUFFIX":"","EXECUTABLE_PREFIX":""},"Type":"PackageType","Name":"Mach-O Dynamic Library","Identifier":"com.apple.package-type.mach-o-dylib","Description":"Mach-O dynamic library"}'
 
 	# backup *ProductTypes.xcspec
 	iosProductTypesXCSpec="$iosSdkPlatformPath/Developer/Library/Xcode/Specifications/${xcspecFileNamePrefix}ProductTypes.xcspec"
@@ -353,8 +353,8 @@ function addXcodeSpecs()
 	requireBackup "$iosProductTypesXCSpec"
 
 	# modify *ProductTypes.xcspec
-	addXcodeSpec "$iosProductTypesXCSpec" "com.apple.product-type.tool" '{Type=ProductType;Identifier=com.apple.product-type.tool;Class=PBXToolProductType;Name="Command-line Tool";Description="Standalone command-line tool";IconNamePrefix="TargetExecutable";DefaultTargetName="Command-line Tool";DefaultBuildProperties={FULL_PRODUCT_NAME="$(EXECUTABLE_NAME)";EXECUTABLE_PREFIX="";EXECUTABLE_SUFFIX="";REZ_EXECUTABLE=YES;INSTALL_PATH="/usr/bin";FRAMEWORK_FLAG_PREFIX="-framework";LIBRARY_FLAG_PREFIX="-l";LIBRARY_FLAG_NOSPACE=YES;GCC_DYNAMIC_NO_PIC=NO;GCC_SYMBOLS_PRIVATE_EXTERN=YES;GCC_INLINES_ARE_PRIVATE_EXTERN=YES;STRIP_STYLE="all";CODE_SIGNING_ALLOWED=YES;ENTITLEMENTS_ALLOWED=YES;MACH_O_TYPE="mh_execute";};PackageTypes=(com.apple.package-type.mach-o-executable);}'	
-	addXcodeSpec "$iosProductTypesXCSpec" "com.apple.product-type.library.dynamic" '{Type=ProductType;Identifier=com.apple.product-type.library.dynamic;Class=PBXDynamicLibraryProductType;Name="Dynamic Library";Description="Dynamic library";IconNamePrefix="TargetLibrary";DefaultTargetName="Dynamic Library";DefaultBuildProperties={FULL_PRODUCT_NAME="$(EXECUTABLE_NAME)";MACH_O_TYPE="mh_dylib";REZ_EXECUTABLE=YES;EXECUTABLE_SUFFIX=".$(EXECUTABLE_EXTENSION)";EXECUTABLE_EXTENSION="dylib";PUBLIC_HEADERS_FOLDER_PATH="/usr/include";PRIVATE_HEADERS_FOLDER_PATH="/usr/include";INSTALL_PATH="/usr/lib";DYLIB_INSTALL_NAME_BASE="$(INSTALL_PATH)";LD_DYLIB_INSTALL_NAME="$(DYLIB_INSTALL_NAME_BASE:standardizepath)/$(EXECUTABLE_PATH)";DYLIB_COMPATIBILITY_VERSION="1";DYLIB_CURRENT_VERSION="1";FRAMEWORK_FLAG_PREFIX="-framework";LIBRARY_FLAG_PREFIX="-l";LIBRARY_FLAG_NOSPACE=YES;STRIP_STYLE="debugging";GCC_INLINES_ARE_PRIVATE_EXTERN=YES;CODE_SIGNING_ALLOWED=YES;};PackageTypes=(com.apple.package-type.mach-o-dylib);}'
+	addXcodeSpec "$iosProductTypesXCSpec" "com.apple.product-type.tool" '{"IconNamePrefix":"TargetExecutable","PackageTypes":["com.apple.package-type.mach-o-executable"],"Name":"Command-line Tool","Type":"ProductType","DefaultTargetName":"Command-line Tool","DefaultBuildProperties":{"REZ_EXECUTABLE":"YES","LIBRARY_FLAG_NOSPACE":"YES","FULL_PRODUCT_NAME":"\$(EXECUTABLE_NAME)","INSTALL_PATH":"\/usr\/bin","CODE_SIGNING_ALLOWED":"YES","GCC_INLINES_ARE_PRIVATE_EXTERN":"YES","GCC_SYMBOLS_PRIVATE_EXTERN":"YES","GCC_DYNAMIC_NO_PIC":"NO","FRAMEWORK_FLAG_PREFIX":"-framework","ENTITLEMENTS_ALLOWED":"YES","STRIP_STYLE":"all","EXECUTABLE_PREFIX":"","MACH_O_TYPE":"mh_execute","EXECUTABLE_SUFFIX":"","LIBRARY_FLAG_PREFIX":"-l"},"Identifier":"com.apple.product-type.tool","Class":"PBXToolProductType","Description":"Standalone command-line tool"}'
+	addXcodeSpec "$iosProductTypesXCSpec" "com.apple.product-type.library.dynamic" '{"IconNamePrefix":"TargetLibrary","PackageTypes":["com.apple.package-type.mach-o-dylib"],"Description":"Dynamic library","Type":"ProductType","DefaultBuildProperties":{"EXECUTABLE_SUFFIX":".\$(EXECUTABLE_EXTENSION)","PRIVATE_HEADERS_FOLDER_PATH":"\/usr\/include","REZ_EXECUTABLE":"YES","FULL_PRODUCT_NAME":"\$(EXECUTABLE_NAME)","LD_DYLIB_INSTALL_NAME":"\$(DYLIB_INSTALL_NAME_BASE:standardizepath)\/\$(EXECUTABLE_PATH)","DYLIB_COMPATIBILITY_VERSION":"1","INSTALL_PATH":"\/usr\/lib","FRAMEWORK_FLAG_PREFIX":"-framework","LIBRARY_FLAG_NOSPACE":"YES","GCC_INLINES_ARE_PRIVATE_EXTERN":"YES","CODE_SIGNING_ALLOWED":"YES","STRIP_STYLE":"debugging","EXECUTABLE_EXTENSION":"dylib","MACH_O_TYPE":"mh_dylib","DYLIB_CURRENT_VERSION":"1","PUBLIC_HEADERS_FOLDER_PATH":"\/usr\/include","DYLIB_INSTALL_NAME_BASE":"\$(INSTALL_PATH)","LIBRARY_FLAG_PREFIX":"-l"},"DefaultTargetName":"Dynamic Library","Class":"PBXDynamicLibraryProductType","Name":"Dynamic Library","Identifier":"com.apple.product-type.library.dynamic"}'
 }
 
 function addXcodeSpec()
@@ -370,35 +370,20 @@ function addXcodeSpec()
 	fileContainsSpecId=`doesFileContain "$specFile" "$specId"`
 	
 	if [[ $fileContainsSpecId == "false" ]]; then
-	
-		# output xcspec file to temp plist file
-		
+			
 		tempDir=`getTempDir`		
 		tempFile="$tempDir/`basename $specFile`.plist"
+				
+		plutil -convert json -o "$tempFile" "$specFile" || \
+			panic $? "Failed to convert XCSpec file $specFile to JSON to temporary file $tempFile"
 		
-		echo "plist=" > "$tempFile" || \
-			panic $? "Failed to echo into temporary file $tempFile"
-			
-		cat "$specFile" >> "$tempFile" || \
-			panic $? "Failed to cat file $specFile into temporary file $tempFile"
-			
-		echo ";" >> "$tempFile" || \
-			panic $? "Failed to echo into temporary file $tempFile"
-
-		# write specData to temp plist file
-
-		writeDefaults "$tempFile" plist "-array-add" "$specData"
-
-		# output temp plist file to temp xcspec file
+		perl -i -pe 's/\]$/,'"$specData"'\]/' "$tempFile" || \
+			panic $? "Failed to add XCSpec to temporary file $tempFile"
 		
-		defaultsRead=`readDefaultsValue "$tempFile" "plist"`
+		plutil -convert binary1 "$tempFile" || \
+			panic $? "Failed to convert temporary file $tempFile to binary"
 
-		echo "$defaultsRead" > "${tempFile%.*}" || \
-			panic $? "Failed to echo into temporary file ${tempFile%.*}"
-			
-		# overwrite existing xcspec file with temp xcspec file
-
-		copyFile "${tempFile%.*}" "$specFile"
+		copyFile "$tempFile" "$specFile"
 	fi
 }
 
@@ -434,7 +419,8 @@ function createSymlink()
 	local sourcePath="$1"
 	local linkPath="$2"
 	
-	rm -f "$linkPath"
+	rm -f "$linkPath" || \
+		panic $? "Failed to remove file: $linkPath"
 	
 	ln -fhs "$sourcePath" "$linkPath" || \
 		panic $? "Failed to create symbolic link $linkPath -> $sourcePath"
@@ -446,7 +432,11 @@ function createSdkPrivateHeaderSymlinks()
 	local iosSdkPath
 	local privateFWsDir
 	local privateFwBinaries
-	
+	local fullPath
+	local shortPath
+	local sourcePath
+	local targetPath
+
 	iosSdkPath=`getSdkProperty $sdk Path`
 	
 	[[ -d "$iosSdkPath" ]] || \
@@ -466,8 +456,15 @@ function createSdkPrivateHeaderSymlinks()
 		sourcePath="${iOSOpenDevPath}/frameworks${shortPath}/Headers"
 		targetPath="${fullPath}/Headers"
 		
-		[[ ! -d "$sourcePath" ]] || \
-			createSymlink "$sourcePath" "$targetPath"
+		if [[ -d "$sourcePath" ]] && [[ ! "$sourcePath" -ef "$targetPath" ]]; then
+			if [[ -L "$targetPath" ]]; then
+				echo "Symlink already exists: $targetPath"
+			elif [[ -e "$targetPath" ]]; then
+				echo "File or directory already exists: $targetPath"
+			else
+				createSymlink "$sourcePath" "$targetPath"
+			fi
+		fi
 	done
 }
 
@@ -527,9 +524,9 @@ base)
 	mkdir -p "$iOSOpenDevPath" || \
 		panic $? "Failed to make directory: $iOSOpenDevPath"
 
-	downloadGithubTarball "https://nodeload.github.com/kokoabim/iOSOpenDev/tarball/master" "$iOSOpenDevPath" "iOSOpenDev base"
-	downloadGithubTarball "https://nodeload.github.com/kokoabim/iOSOpenDev-Xcode-Templates/tarball/master" "$iOSOpenDevPath/templates" "Xcode templates"
-	downloadGithubTarball "https://nodeload.github.com/kokoabim/iOSOpenDev-Framework-Header-Files/tarball/master" "$iOSOpenDevPath/frameworks" "framework header files"
+	downloadGithubTarball "https://nodeload.github.com/kokoabim/iOSOpenDev/tar.gz/master" "$iOSOpenDevPath" "iOSOpenDev base"
+	downloadGithubTarball "https://nodeload.github.com/kokoabim/iOSOpenDev-Xcode-Templates/tar.gz/master" "$iOSOpenDevPath/templates" "Xcode templates"
+	downloadGithubTarball "https://nodeload.github.com/kokoabim/iOSOpenDev-Framework-Header-Files/tar.gz/master" "$iOSOpenDevPath/frameworks" "framework header files"
 
 	# symlink to templates #
 	
