@@ -38,7 +38,7 @@ export backupFileExt=".iOSOpenDev"
 export userName="${SUDO_USER-$USER}"
 export userGroup=`id -g $userName`
 export userHome=`eval echo ~$userName`
-export bashProfileFiles=("$userHome/.bash_profile" "$userHome/.bash_login" "$userHome/.profile")
+export bashProfileFiles=("$userHome/.bash_profile" "$userHome/.bashrc" "$userHome/.zshrc" "$userHome/.bash_login" "$userHome/.profile")
 
 export tempDirsFile="`mktemp -d -t $scriptName`/tempdirs"
 touch "$tempDirsFile"
@@ -528,8 +528,8 @@ base)
 
 	# create empty frameworks directory #
 	
-	mkdir -p "$iOSOpenDevPath\frameworks" || \
-		panic $? "Failed to make directory: $iOSOpenDevPath\frameworks"
+	mkdir -p "$iOSOpenDevPath/frameworks" || \
+		panic $? "Failed to make directory: $iOSOpenDevPath/frameworks"
 
 	# symlink to templates #
 	
