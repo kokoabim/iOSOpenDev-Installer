@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# --------------------------------------------------------------
+# -----------------------------------------------------------------------
 # iOSOpenDev -- iOS Open Development (http://www.iOSOpenDev.com)
-# Copyright (C) 2012 Spencer W.S. James <dev@iosopendev.com>
-# --------------------------------------------------------------
+# Copyright (C) 2012-2013 Spencer W.S. James (Kokoabim) <kokoabim@me.com>
+# -----------------------------------------------------------------------
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -15,11 +15,11 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-# --------------------------------------------------------------
+# -----------------------------------------------------------------------
 # iOSOpenDev is an independent project and has not been authorized, sponsored, or otherwise approved by Apple Inc.
 # IOS is a registered trademark of Cisco and is used under license by Apple Inc.
 # Xcode is a registered trademark of Apple Inc.
-# --------------------------------------------------------------
+# -----------------------------------------------------------------------
 
 export setCmd="set -eo pipefail"
 $setCmd
@@ -30,7 +30,7 @@ export PATH=/opt/iOSOpenDev/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin:$PA
 # script #
 
 export scriptName="${0##*/}"
-export scriptVer="1.2.2"
+export scriptVer="1.3"
 
 export iOSOpenDevPath="/opt/iOSOpenDev"
 export backupFileExt=".iOSOpenDev"
@@ -317,9 +317,9 @@ function modifySdkSettings()
 	requireBackup "$sdkSettingsPList"
 
 	# change SDKSettings.plist
-	writeDefaults "$sdkSettingsPList" DefaultProperties "-dict-add" CODE_SIGNING_REQUIRED "-bool" NO
-	writeDefaults "$sdkSettingsPList" DefaultProperties "-dict-add" ENTITLEMENTS_REQUIRED "-bool" NO
-	writeDefaults "$sdkSettingsPList" DefaultProperties "-dict-add" AD_HOC_CODE_SIGNING_ALLOWED "-bool" YES
+	writeDefaults "$sdkSettingsPList" DefaultProperties "-dict-add" CODE_SIGNING_REQUIRED "-string" NO
+	writeDefaults "$sdkSettingsPList" DefaultProperties "-dict-add" ENTITLEMENTS_REQUIRED "-string" NO
+	writeDefaults "$sdkSettingsPList" DefaultProperties "-dict-add" AD_HOC_CODE_SIGNING_ALLOWED "-string" YES
 	
 	# fix mode
 	changeMode 0644 "$sdkSettingsPList"
@@ -485,8 +485,7 @@ Usages:
    $scriptName sdk [-sdk <sdk>] [-d <directory>] [-which]
 
 Arguments:
-   base               Set up iOSOpenDev base, Xcode templates and private
-                      framework header files.
+   base               Set up iOSOpenDev base and Xcode templates.
 
    sdk                Set up latest iOS SDK for \"open\" development.
 
@@ -519,14 +518,18 @@ case "$1" in
 
 base)
 	
-	# get iOSOpenDev base, frameworks and templates #
+	# get base and templates #
 	
 	mkdir -p "$iOSOpenDevPath" || \
 		panic $? "Failed to make directory: $iOSOpenDevPath"
 
 	downloadGithubTarball "https://nodeload.github.com/kokoabim/iOSOpenDev/tar.gz/master" "$iOSOpenDevPath" "iOSOpenDev base"
 	downloadGithubTarball "https://nodeload.github.com/kokoabim/iOSOpenDev-Xcode-Templates/tar.gz/master" "$iOSOpenDevPath/templates" "Xcode templates"
-	downloadGithubTarball "https://nodeload.github.com/kokoabim/iOSOpenDev-Framework-Header-Files/tar.gz/master" "$iOSOpenDevPath/frameworks" "framework header files"
+
+	# create empty frameworks directory #
+	
+	mkdir -p "$iOSOpenDevPath\frameworks" || \
+		panic $? "Failed to make directory: $iOSOpenDevPath\frameworks"
 
 	# symlink to templates #
 	
