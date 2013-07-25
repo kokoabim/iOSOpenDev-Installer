@@ -30,7 +30,7 @@ export PATH=/opt/iOSOpenDev/bin:/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin:$PA
 # script #
 
 export scriptName="${0##*/}"
-export scriptVer="1.3"
+export scriptVer="1.3.1"
 
 export iOSOpenDevPath="/opt/iOSOpenDev"
 export backupFileExt=".iOSOpenDev"
@@ -523,8 +523,8 @@ base)
 	mkdir -p "$iOSOpenDevPath" || \
 		panic $? "Failed to make directory: $iOSOpenDevPath"
 
-	downloadGithubTarball "https://nodeload.github.com/kokoabim/iOSOpenDev/tar.gz/master" "$iOSOpenDevPath" "iOSOpenDev base"
-	downloadGithubTarball "https://nodeload.github.com/kokoabim/iOSOpenDev-Xcode-Templates/tar.gz/master" "$iOSOpenDevPath/templates" "Xcode templates"
+	downloadGithubTarball "https://codeload.github.com/kokoabim/iOSOpenDev/tar.gz/master" "$iOSOpenDevPath" "iOSOpenDev base"
+	downloadGithubTarball "https://codeload.github.com/kokoabim/iOSOpenDev-Xcode-Templates/tar.gz/master" "$iOSOpenDevPath/templates" "Xcode templates"
 
 	# create empty frameworks directory #
 	
